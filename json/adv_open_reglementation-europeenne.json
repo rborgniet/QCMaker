@@ -1,0 +1,3 @@
+[
+{"id":1,"q":"Quel événement définit un accident lié à l'utilisation d'un UAS ?","opts":["Une panne du système de propulsion sans blessure","La disparition de l'UAS ou une blessure grave/mortelle causée par l'UAS","Une perte de connexion temporaire entre le drone et le télépilote","Un atterrissage en dehors de la zone prévue sans dégâts"],"ans":"La disparition de l'UAS ou une blessure grave/mortelle causée par l'UAS","why":"Un accident implique soit une blessure grave ou mortelle suite à un contact direct avec l'UAS ou ses parties, soit la disparition de l'appareil."}
+]

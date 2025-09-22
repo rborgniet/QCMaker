@@ -1,0 +1,146 @@
+  <!DOCTYPE html>
+  <html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="Entraînement QCM UAS CATS — Simulation A1/A3 & A2" />
+    <title>UAS CATS Training</title>
+    <link rel="stylesheet" href="/css/custom.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- Topbar: même structure/classes que ton CSS -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <!-- Menu Paramètres -->
+          <details class="menu" id="settingsMenu">
+            <summary aria-label="Ouvrir le menu des paramètres">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                  fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"
+                  role="img" aria-hidden="true" focusable="false">
+                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+              </svg>
+            </summary>
+
+            <div class="panel" role="region" aria-label="Paramètres">
+              <div class="row-setting">
+                <div>Configuration</div>
+              </div>
+              <hr class="divider" />
+              <div class="row-setting">
+                <div><label for="swInstant">Correction instantanée</label></div>
+                <div id="swInstant" class="switch" role="switch" aria-checked="false" tabindex="0"></div>
+              </div>
+
+              <div class="row-setting">
+                <div><label for="swShuffle">Mélanger les options</label></div>
+                <div id="swShuffle" class="switch" role="switch" aria-checked="false" tabindex="0"></div>
+              </div>
+
+              <div class="row-setting">
+                <div><label for="swTimer">Activer un compte à rebours</label></div>
+                <div id="swTimer" class="switch" role="switch" aria-checked="false" tabindex="0"></div>
+              </div>
+
+              <div class="row-setting" id="rowTimer" style="display:none">
+                <div><label for="timerSec">Durée (secondes)</label></div>
+                <div>
+                  <input id="timerSec" name="timerSec" type="number" min="5" step="5" inputmode="numeric" placeholder="ex: 30" />
+                </div>
+              </div>
+
+              <div class="row-setting">
+                <div><label for="swLimit">Limiter le nombre de questions</label></div>
+                <div id="swLimit" class="switch" role="switch" aria-checked="false" tabindex="0"></div>
+              </div>
+
+              <div class="row-setting" id="rowCount" style="display:none">
+                <div><label for="qCount">Nombre de questions</label></div>
+                <div>
+                  <input id="qCount" name="qCount" type="number" min="1" inputmode="numeric" />
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Sélection multi-séries -->
+        <details class="menu" id="seriesMenu">
+          <summary id="seriesSummary" aria-label="Ouvrir le menu des séries">
+            <span id="seriesLabel" class="muted">Sélection personnalisée</span>
+          </summary>
+
+          <div class="panel" role="region" aria-label="Sélection des séries">
+            <div class="row-setting">
+              <div class="muted">Inclure dans la série</div>
+            </div>
+
+            <hr class="divider" />
+
+            <div id="seriesList" class="series-list" style="display:flex;flex-direction:column;gap:8px"></div>
+
+            <div style="display:flex;gap:8px;align-items:center;margin-top:15px">
+              <button type="button" class="menu-btn" id="btnToggle">Tout sélectionner</button>
+            </div>
+            <hr class="divider" />
+            <button type="button" class="menu-btn" id="reloadCurrent">Recommencer</button>
+          </div>
+        </details>
+
+        <div class="pill" id="score" aria-live="polite" aria-atomic="true">Score: 0</div>
+      </div>
+
+      <!-- Carte QCM -->
+      <div id="card" class="card" hidden>
+        <div class="progress" aria-label="Progression du questionnaire">
+          <div id="progress" class="muted" aria-live="polite">—</div>
+          <div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <i id="meterFill" aria-hidden="true"></i>
+          </div>
+          <div class="timer" id="timer" hidden aria-hidden="true">
+            <span id="timerLeft">—</span>
+          </div>
+        </div>
+
+        <h1 id="question" class="q" role="heading" aria-level="1"></h1>
+        <div id="opts" class="opts" role="group" aria-label="Options de réponse"></div>
+        <div id="why" class="why" role="note" aria-live="polite"></div>
+
+        <div class="row">
+          <button id="prev" type="button" aria-label="Question précédente">Question précédente</button>
+          <div class="spacer" aria-hidden="true"></div>
+          <button id="next" type="button" hidden aria-label="Question suivante">Question suivante</button>
+        </div>
+      </div>
+
+      <!-- PANE ERREUR (hidden par défaut, montré via JS) -->
+      <div id="cardError" class="card-error" role="alert" aria-live="assertive" hidden>
+        <h2 id="cardErrorTitle">Erreur de chargement</h2>
+        <p id="cardErrorMsg" class="muted"></p>
+        <div class="row" style="margin-top:12px">
+          <button id="btnRetry" type="button" aria-label="Réessayer">Réessayer</button>
+          <div class="spacer" aria-hidden="true"></div>
+          <button id="btnDetails" type="button" aria-label="Détails" hidden>Voir les détails</button>
+        </div>
+      </div>
+
+      <p id="status" class="muted" aria-live="polite"></p>
+    </div>
+
+    <footer>© <span data-year></span> Rudy Borgniet, Simulation A1/A3 - A2</footer>
+
+    <noscript>
+      <p class="muted">JavaScript est requis.</p>
+    </noscript>
+
+    <script>
+      (function(){
+        var y = new Date().getFullYear();
+        var el = document.querySelector('footer [data-year]');
+        if (el) el.textContent = y;
+      }());
+    </script>
+
+    <script src="/js/custom.js" defer></script>
+  </body>
+  </html>
