@@ -741,6 +741,9 @@ function endQuiz(){
   }
   QUIZ_ENDED = true;
 
+  IDX = RUN.length;
+  current = null;
+
   scoreEl.textContent = `Score: ${score}`;
 
   const nAll = getQuestionLimit() || 0;
