@@ -1,9 +1,9 @@
 /* ——— LISTE DES SÉRIES ——— */
 const SESSIONS = [
-  { id: "def", label: "Définitions", src: "json/adv_open_definition.json" },
-  { id: "re",  label: "Réglementation Européenne", src: "json/adv_open_reglementation-europeenne.json" },
-  { id: "geozones",  label: "Zones Géographiques - Géozones", src: "json/adv_open_zones-geographiques-geozones.json" },
-  { id: "met", label: "Météorologie", src: "json/adv_open_meteorologie.json" },
+  { id: "def",      label: "Définitions",                      src: "json/adv_open_definition.json" },
+  { id: "re",       label: "Réglementation Européenne",        src: "json/adv_open_reglementation-europeenne.json" },
+  { id: "geozones", label: "Zones Géographiques - Géozones",   src: "json/adv_open_zones-geographiques-geozones.json" },
+  { id: "met",      label: "Météorologie",                     src: "json/adv_open_meteorologie.json" },
 ];
 
 /* ——— CONFIG ——— */
@@ -36,11 +36,15 @@ const progressEl = $('#progress'), scoreEl = $('#score'), nextBtn = $('#next'), 
 const meterFill = $('#meterFill');
 const rowEl = document.querySelector('.row');
 
+/* ——— START PANE ——— */
+const startPane = $('#startPane');
+const btnStart  = $('#btnStart');
+
 const settingsMenu = $('#settingsMenu');
 const swInstant = $('#swInstant');
 const swShuffle = $('#swShuffle');
 const swLimit   = $('#swLimit');
-const swKeys   = $('#swKeys');
+const swKeys    = $('#swKeys');
 const rowCount  = $('#rowCount');
 const qCount    = $('#qCount');
 
@@ -57,7 +61,7 @@ const btnToggle   = $('#btnToggle');
 const reloadButton= $('#reloadCurrent');
 
 let OPT_NODES = [];
-const SESSION_STATUS = new Map(); 
+const SESSION_STATUS = new Map();
 
 /* ——— PANE ERREUR (facultatif si présent dans le HTML) ——— */
 const errPane   = document.getElementById('cardError');
@@ -68,13 +72,13 @@ const btnDetail = document.getElementById('btnDetails');
 
 let LAST_LOAD_ERROR_DETAILS = "";
 
+/* ——— Helpers show/hide ——— */
 function hide(el){
   if(el){
     el.hidden = true;
     el.style.display = 'none';
   }
 }
-
 function show(el){
   if(el){
     el.hidden = false;
@@ -85,6 +89,7 @@ function show(el){
 /* ——— UI STATE HELPERS ——— */
 function setCardStateError(title, message, details, onRetry){
   hide(card);
+  hide(startPane);
 
   LAST_LOAD_ERROR_DETAILS = details || '';
 
@@ -111,21 +116,34 @@ function setCardStateError(title, message, details, onRetry){
     show(statusEl);
   }
 }
-
 function clearCardError(){
-  hide(errPane); 
+  hide(errPane);
   hide(statusEl);
-  show(card);
 }
-
 function setCardStateLoading(text){
-  hide(card);         
-  hide(errPane);     
+  hide(card);
+  hide(startPane);
+  hide(errPane);
   if (statusEl){
     statusEl.className = '';
     statusEl.textContent = text || 'Chargement...';
     show(statusEl);
   }
+}
+
+/* ——— ÉCRAN DE DÉMARRAGE ——— */
+function showStartPane(){
+  stopTimer();
+  hide(card);
+  hide(errPane);
+  if (statusEl) statusEl.hidden = true;
+  show(startPane);
+}
+function startQuiz(){
+  clearCardError();
+  hide(startPane);
+  show(card);
+  askFirstQuestion();
 }
 
 /* ——— INIT ——— */
@@ -153,12 +171,14 @@ async function init(){
   await loadBankForSelection(SELECTED);
 
   if (statusEl) statusEl.hidden = true;
-  if (card) card.hidden = false;
 
   resetQuiz();
-  askFirstQuestion();
+  showStartPane();                // ⟵ on affiche l’écran de démarrage
   bindSettings();
   bindSeriesMenu();
+
+  // Clic sur "Commencer"
+  btnStart?.addEventListener('click', startQuiz);
 
   // Si certaines séries ont échoué, on affiche un avertissement non bloquant
   if (LAST_LOAD_ERROR_DETAILS){
@@ -172,9 +192,7 @@ async function init(){
           try{
             await loadBankForSelection(SELECTED);
             clearCardError();
-            restartQuiz();
-            if (statusEl) statusEl.hidden = true;
-            if (card) card.hidden = false;
+            restartQuiz(); // retour à l’écran de démarrage
           }catch(e){
             setCardStateError('Erreur', 'Toujours des erreurs au chargement.', e?.message || String(e));
           }
@@ -212,9 +230,7 @@ async function loadBankForSelection(selIds){
   updateSeriesHeader(ids);
   updateToggleButton();
 
-  let all = [];
   const index = new Map(SESSIONS.map(s=>[s.id, s]));
-  // on agrège succès/erreurs
   const jobs = ids.map(id => fetchJSON(index.get(id).src));
   const settled = await Promise.allSettled(jobs);
 
@@ -267,7 +283,6 @@ function updateSeriesHeader(ids){
     seriesLabel.textContent = `Mix personnalisé (${ids.length})`;
   }
 }
-
 function updateToggleButton(){
   if (!btnToggle) return;
   const inputs = seriesList.querySelectorAll('input[name="series"]');
@@ -430,13 +445,11 @@ function buildSeriesMenu(){
   updateSeriesHeader(SELECTED);
   updateToggleButton();
 }
-
 function checkedSeries(){
   const arr = [];
   seriesList.querySelectorAll('input[name="series"]').forEach(b=>{ if(b.checked) arr.push(b.value); });
   return arr.length ? arr : SESSIONS.map(s=>s.id);
 }
-
 async function onSeriesChanged(){
   try{
     SELECTED = checkedSeries();
@@ -458,7 +471,6 @@ async function onSeriesChanged(){
     );
   }
 }
-
 function bindSeriesMenu(){
   btnToggle?.addEventListener('click', ()=>{
     const inputs = seriesList.querySelectorAll('input[name="series"]');
@@ -488,8 +500,6 @@ function bindSeriesMenu(){
             await loadBankForSelection(SELECTED);
             clearCardError();
             restartQuiz();
-            if (statusEl) statusEl.hidden = true;
-            if (card) card.hidden = false;
           }catch(e){
             setCardStateError('Échec', 'Nouvelle tentative ratée.', e?.message || String(e));
           }
@@ -531,7 +541,6 @@ function formatSec(s){
   const ss = s % 60;
   return `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
 }
-
 function updateTimerUI(){
   if (!timerBox) return;
   const show = !!(SETTINGS.timer && current && !QUIZ_ENDED && !ANSWERS.get(current?.id));
@@ -539,12 +548,10 @@ function updateTimerUI(){
   if (!show) return;
   if (timerLeft) timerLeft.textContent = formatSec(TIMER_LEFT);
 }
-
 function stopTimer(){
   if (TIMER_ID){ clearInterval(TIMER_ID); TIMER_ID = null; }
   clearAutoAdvance();
 }
-
 function startQuestionTimer(){
   if (!SETTINGS.timer) return;
   stopTimer();
@@ -559,7 +566,6 @@ function startQuestionTimer(){
     }
   }, 1000);
 }
-
 function onTimeUp(){
   if (!current || ANSWERS.get(current.id)) return;
 
@@ -793,6 +799,15 @@ document.addEventListener('keydown', (e)=>{
   const isEditable = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
   if(isEditable) return;
 
+  // Si l'écran de démarrage est visible, Enter lance le quiz
+  if (!startPane?.hidden && btnStart){
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      btnStart.click();
+      return;
+    }
+  }
+
   const k = e.key;
   if(k === 'Enter' || k === 'ArrowRight'){
     if(!nextBtn.hidden){ e.preventDefault(); goNext(); }
@@ -817,8 +832,7 @@ prevBtn.addEventListener('click', goPrev);
 
 function restartQuiz(){
   resetQuiz();
-  if (card) card.hidden = false;
-  askFirstQuestion();
+  showStartPane(); // ⟵ on revient à l’écran de démarrage
 }
 
 /* ——— Bonus UX : offline ——— */
