@@ -2,6 +2,7 @@
 const SESSIONS = [
   { id: "def", label: "Définitions", src: "json/adv_open_definition.json" },
   { id: "re",  label: "Réglementation Européenne", src: "json/adv_open_reglementation-europeenne.json" },
+  { id: "geozones",  label: "Zones Géographiques - Géozones", src: "json/adv_open_zones-geographiques-geozones.json" },
   { id: "met", label: "Météorologie", src: "json/adv_open_meteorologie.json" },
 ];
 
