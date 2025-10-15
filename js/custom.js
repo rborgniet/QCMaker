@@ -10,7 +10,7 @@ const SESSIONS = [
 const PASS_THRESHOLD = 0.75;
 
 /* ——— Paramètres persistés ——— */
-const DEFAULT_SETTINGS = { instant:true, shuffle:true, limit:false, count:10, timer:false, tsec:30 };
+const DEFAULT_SETTINGS = { instant:true, shuffle:true, limit:false, count:10, timer:false, tsec:30, keys:true };
 let SETTINGS = loadSettings();
 
 /* ——— Sélection persistée (multi) ——— */
@@ -40,6 +40,7 @@ const settingsMenu = $('#settingsMenu');
 const swInstant = $('#swInstant');
 const swShuffle = $('#swShuffle');
 const swLimit   = $('#swLimit');
+const swKeys   = $('#swKeys');
 const rowCount  = $('#rowCount');
 const qCount    = $('#qCount');
 
@@ -302,6 +303,7 @@ function applySettingsUI(){
   swInstant?.classList.toggle('on', SETTINGS.instant);
   swShuffle?.classList.toggle('on', SETTINGS.shuffle);
   swLimit  ?.classList.toggle('on', SETTINGS.limit);
+  swKeys?.classList.toggle('on', SETTINGS.keys);
   scoreEl.classList.toggle('hidden', !SETTINGS.instant);
 
   if (rowCount) rowCount.style.display = SETTINGS.limit ? 'flex' : 'none';
@@ -396,6 +398,8 @@ function bindSettings(){
   seriesMenu?.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { seriesMenu.open = false; seriesMenu.querySelector('summary')?.focus(); }
   });
+
+  toggle(swKeys, 'keys');
 }
 
 /* ——— Sélecteur multi-séries (auto-apply) ——— */
@@ -799,9 +803,9 @@ document.addEventListener('keydown', (e)=>{
   }
   if(k.length === 1){
     const code = k.toUpperCase().charCodeAt(0);
-    if(code >= 65 && code <= 90){
-      const idx = code - 65;
-      if(OPT_NODES[idx]){ e.preventDefault(); pickIndex(idx); }
+    if (SETTINGS.keys && code >= 65 && code <= 90) {
+      const idx = code - 65; // A=0, B=1, C=2, D=3, ...
+      if (OPT_NODES[idx]) { e.preventDefault(); pickIndex(idx); }
     }
   }
 });
