@@ -304,6 +304,7 @@ function applySettingsUI(){
   swShuffle?.classList.toggle('on', SETTINGS.shuffle);
   swLimit  ?.classList.toggle('on', SETTINGS.limit);
   swKeys?.classList.toggle('on', SETTINGS.keys);
+  swKeys?.setAttribute('aria-checked', String(!!SETTINGS.keys));
   scoreEl.classList.toggle('hidden', !SETTINGS.instant);
 
   if (rowCount) rowCount.style.display = SETTINGS.limit ? 'flex' : 'none';
