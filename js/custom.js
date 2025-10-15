@@ -274,6 +274,11 @@ async function loadBankForSelection(selIds){
   applySettingsUI();
 }
 
+function areShortcutsEnabled(){
+  // Raccourcis actifs seulement en cours d’épreuve, sur une question non répondue
+  return !!(SETTINGS.keys && !QUIZ_ENDED && current && !ANSWERS.get(current.id));
+}
+
 function updateSeriesHeader(ids){
   if (ids.length === SESSIONS.length) {
     seriesLabel.textContent = "Tout (mélangé)";
@@ -743,6 +748,7 @@ function endQuiz(){
 
   IDX = RUN.length;
   current = null;
+  OPT_NODES = [];
 
   scoreEl.textContent = `Score: ${score}`;
 
@@ -820,9 +826,10 @@ document.addEventListener('keydown', (e)=>{
     if(!prevBtn.disabled){ e.preventDefault(); goPrev(); }
     return;
   }
-  if(k.length === 1){
-    const code = k.toUpperCase().charCodeAt(0);
-    if (SETTINGS.keys && code >= 65 && code <= 90) {
+  // Lettres A/B/C/D (désactivées si areShortcutsEnabled() est faux)
+  if (e.key.length === 1 && areShortcutsEnabled()){
+    const code = e.key.toUpperCase().charCodeAt(0);
+    if (code >= 65 && code <= 90) {
       const idx = code - 65; // A=0, B=1, C=2, D=3, ...
       if (OPT_NODES[idx]) { e.preventDefault(); pickIndex(idx); }
     }
