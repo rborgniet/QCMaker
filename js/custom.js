@@ -6,7 +6,7 @@ const SESSIONS = [
   { id: "met",      label: "Météorologie",                     src: "json/adv_open_meteorologie.json" },
   { id: "cdvuasa1", label: "Connaissance Du Vol UAS A1",       src: "json/adv_open_connaissance-du-vol-uas-a1.json" },
   { id: "cdvuasa2", label: "Connaissance Du Vol UAS A2",       src: "json/adv_open_connaissance-du-vol-uas-a2.json" },
-  { id: "procop",   label: "Procedures Operationnelles",       src: "json/adv_open_procedures-operationnelles.json" },
+  { id: "procop",   label: "Procédures Opérationnelles",       src: "json/adv_open_procedures-operationnelles.json" },
   { id: "secaer",   label: "Sécurite Aérienne",                src: "json/adv_open_securite-aerienne.json" },
   { id: "perfhum",  label: "Performances Humaines",            src: "json/adv_open_performances-humaines.json" },
   { id: "surete",   label: "Sureté",                           src: "json/adv_open_surete.json" },
