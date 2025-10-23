@@ -7,7 +7,11 @@ const SESSIONS = [
   { id: "cdvuasa1", label: "Connaissance Du Vol UAS A1",       src: "json/adv_open_connaissance-du-vol-uas-a1.json" },
   { id: "cdvuasa2", label: "Connaissance Du Vol UAS A2",       src: "json/adv_open_connaissance-du-vol-uas-a2.json" },
   { id: "procop",   label: "Procedures Operationnelles",       src: "json/adv_open_procedures-operationnelles.json" },
-  { id: "secaer",   label: "Securite Aerienne",                src: "json/adv_open_securite-aerienne.json" },
+  { id: "secaer",   label: "Sécurite Aérienne",                src: "json/adv_open_securite-aerienne.json" },
+  { id: "perfhum",  label: "Performances Humaines",            src: "json/adv_open_performances-humaines.json" },
+  { id: "surete",   label: "Sureté",                           src: "json/adv_open_surete.json" },
+  { id: "assur",    label: "Assurance",                        src: "json/adv_open_assurance.json" },
+  { id: "rgpd",     label: "Vie Privée / RGPD",                src: "json/adv_open_vie-privee-rgpd.json" },
 ];
 
 /* ——— CONFIG ——— */
